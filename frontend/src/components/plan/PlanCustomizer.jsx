@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 const INTENSITY_LEVELS = ['Relaxed', 'Balanced', 'Aggressive'];
 
 const WEAK_AREAS = [
@@ -12,6 +14,7 @@ function PlanCustomizer({
   onTopicClick, onOpenModal,
   onUsePlan, onCustomize, isDark,
 }) {
+  const navigate    = useNavigate();
   const surface     = isDark ? 'rgba(28,29,32,0.95)' : '#FFFFFF';
   const surfaceHigh = isDark ? 'rgba(38,39,42,0.9)'  : '#F8FAFC';
   const border      = isDark ? 'rgba(70,69,84,0.2)'  : 'rgba(0,0,0,0.07)';
@@ -133,6 +136,19 @@ function PlanCustomizer({
           onClick={onCustomize}
         >
           Customise Plan
+        </button>
+      </div>
+
+      {/* AI Mentor link */}
+      <div className="flex items-center justify-center gap-2">
+        <span className="text-[11px]" style={{ color: textSec }}>Not sure about a topic?</span>
+        <button
+          onClick={() => navigate('/chatbot')}
+          className="inline-flex items-center gap-1.5 text-[11px] font-bold hover:opacity-75 transition-opacity"
+          style={{ color: '#6366F1' }}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: '13px', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+          Ask AI Mentor
         </button>
       </div>
     </section>

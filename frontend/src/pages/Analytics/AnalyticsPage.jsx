@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import DashboardLayout from '../../components/layout/DashboardLayout.jsx';
 
-/* ── Platform data for Problems Solved toggle ── */
+/* ── Platform data — #6366F1 only ── */
 const PLATFORM_DATA = {
   total: {
     label:  'Total',
@@ -19,7 +19,7 @@ const PLATFORM_DATA = {
     medium: { solved: 25,  total: 1800 },
     hard:   { solved: 5,   total: 600  },
     url:    'https://leetcode.com',
-    color:  '#7C3AED',
+    color:  '#6366F1',
   },
   codeforces: {
     label:  'Codeforces',
@@ -28,46 +28,30 @@ const PLATFORM_DATA = {
     medium: { solved: 20,  total: 337  },
     hard:   { solved: 2,   total: 221  },
     url:    'https://codeforces.com',
-    color:  '#A855F7',
+    color:  '#6366F1',
   },
 };
 
-/* ── Achievement badges (chess.com style) ── */
+/* ── Achievement badges ── */
 const ACHIEVEMENTS = [
-  { id: 'contest_1',  icon: '🏆', label: 'Contest Victor', desc: 'Complete a weekly contest',   earned: true,  date: 'Jan 2026' },
-  { id: 'mock_1',     icon: '📋', label: 'Mock Master',    desc: 'Complete 5 mock tests',        earned: true,  date: 'Feb 2026' },
-  { id: 'algo_1',     icon: '🧠', label: 'Algo Unlocked',  desc: 'Mastered a new algorithm',    earned: true,  date: 'Mar 2026' },
-  { id: 'contest_2',  icon: '⚡', label: 'Speed Racer',    desc: 'Finish contest top 25%',       earned: false },
-  { id: 'mock_2',     icon: '🎯', label: 'Perfect Score',  desc: '100% on a mock test',          earned: false },
-  { id: 'algo_2',     icon: '🌐', label: 'Graph Guru',     desc: 'Master graph algorithms',      earned: false },
+  { id: 'contest_1', icon: '🏆', label: 'Contest Victor', desc: 'Complete a weekly contest',  earned: true,  date: 'Jan 2026' },
+  { id: 'mock_1',    icon: '📋', label: 'Mock Master',    desc: 'Complete 5 mock tests',       earned: true,  date: 'Feb 2026' },
+  { id: 'algo_1',    icon: '🧠', label: 'Algo Unlocked',  desc: 'Mastered a new algorithm',   earned: true,  date: 'Mar 2026' },
+  { id: 'contest_2', icon: '⚡', label: 'Speed Racer',    desc: 'Finish contest top 25%',      earned: false },
+  { id: 'mock_2',    icon: '🎯', label: 'Perfect Score',  desc: '100% on a mock test',         earned: false },
+  { id: 'algo_2',    icon: '🌐', label: 'Graph Guru',     desc: 'Master graph algorithms',     earned: false },
 ];
 
-/* ── Top 3 strengths — before vs after ── */
-const TOP_STRENGTHS = [
-  { name: 'Arrays',  before: 52, after: 88, color: '#6366F1' },
-  { name: 'Trees',   before: 40, after: 78, color: '#A855F7' },
-  { name: 'Strings', before: 35, after: 70, color: '#8B5CF6' },
-];
-
-/* ── Friend leaderboard ── */
-const FRIEND_LB = [
-  { rank: 1, name: 'Alex Chen',   avatar: 'AC', color: '#6366F1', solved: 520, streak: 22, online: true  },
-  { rank: 2, name: 'Sara Kim',    avatar: 'SK', color: '#A855F7', solved: 480, streak: 15, online: true  },
-  { rank: 3, name: 'Raj Patel',   avatar: 'RP', color: '#22C55E', solved: 445, streak: 8,  online: false },
-  { rank: 4, name: 'You',         avatar: 'ME', color: '#F59E0B', solved: 412, streak: 14, online: true,  isSelf: true },
-  { rank: 5, name: 'Jake Wilson', avatar: 'JW', color: '#EF4444', solved: 398, streak: 5,  online: false },
-];
-
-/* ── Topic progress ── */
+/* ── Topic progress + before/after strengths (merged) ── */
 const TOPIC_DATA = [
-  { name: 'Arrays',    solved: 92, total: 120, color: '#6366F1' },
-  { name: 'Trees',     solved: 60, total: 80,  color: '#A855F7' },
-  { name: 'Strings',   solved: 55, total: 70,  color: '#8B5CF6' },
-  { name: 'DP',        solved: 45, total: 100, color: '#7C3AED' },
-  { name: 'Graphs',    solved: 28, total: 90,  color: '#EF4444' },
-  { name: 'Greedy',    solved: 35, total: 60,  color: '#22C55E' },
-  { name: 'Backtrack', solved: 20, total: 50,  color: '#EC4899' },
-  { name: 'Bit Manip', solved: 18, total: 40,  color: '#F59E0B' },
+  { name: 'Arrays',      solved: 92, total: 120, color: '#6366F1', before: 52, after: 88, isStrength: true  },
+  { name: 'Trees',       solved: 60, total: 80,  color: '#6366F1', before: 40, after: 78, isStrength: true  },
+  { name: 'Strings',     solved: 55, total: 70,  color: '#6366F1', before: 35, after: 70, isStrength: true  },
+  { name: 'DP',          solved: 45, total: 100, color: '#6366F1', isStrength: false },
+  { name: 'Graphs',      solved: 28, total: 90,  color: '#6366F1', isStrength: false },
+  { name: 'Greedy',      solved: 35, total: 60,  color: '#6366F1', isStrength: false },
+  { name: 'Backtrack',   solved: 20, total: 50,  color: '#6366F1', isStrength: false },
+  { name: 'Bit Manip',   solved: 18, total: 40,  color: '#6366F1', isStrength: false },
 ];
 
 /* ── Recent activity ── */
@@ -77,6 +61,35 @@ const RECENT = [
   { title: 'Coin Change',         diff: 'Medium', time: 'Yesterday', status: 'Solved',    color: '#22C55E' },
   { title: 'N-Queens',            diff: 'Hard',   time: '2 days',    status: 'Solved',    color: '#22C55E' },
 ];
+
+/* ── Generate heatmap data: 52 weeks × 7 days ── */
+function generateHeatmap() {
+  const cells = [];
+  const today = new Date();
+  const startDate = new Date(today);
+  startDate.setDate(today.getDate() - 363); // 52 weeks back
+  // align to Sunday
+  startDate.setDate(startDate.getDate() - startDate.getDay());
+
+  for (let w = 0; w < 53; w++) {
+    for (let d = 0; d < 7; d++) {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + w * 7 + d);
+      // Fake activity: past days only, random sparse data
+      const isPast = date <= today;
+      let count = 0;
+      if (isPast) {
+        const r = Math.random();
+        if (r > 0.55) count = 0;
+        else if (r > 0.3) count = 1 + Math.floor(Math.random() * 2);
+        else if (r > 0.15) count = 3 + Math.floor(Math.random() * 3);
+        else count = 6 + Math.floor(Math.random() * 5);
+      }
+      cells.push({ date, count, week: w, day: d });
+    }
+  }
+  return cells;
+}
 
 /* ── Donut SVG ── */
 function SolvedDonut({ pd, surfLow, textPri, textSec }) {
@@ -116,6 +129,111 @@ function SolvedDonut({ pd, surfLow, textPri, textSec }) {
   );
 }
 
+/* ── Activity Heatmap ── */
+function ActivityHeatmap({ isDark, surface, border, textSec }) {
+  const cells = useMemo(() => generateHeatmap(), []);
+  const surfLow = isDark ? '#292a2c' : '#F1F5F9';
+
+  const MONTH_LABELS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const DAY_LABELS   = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
+
+  function cellColor(count) {
+    if (count === 0) return surfLow;
+    if (count <= 2)  return isDark ? 'rgba(99,102,241,0.25)' : 'rgba(99,102,241,0.2)';
+    if (count <= 4)  return isDark ? 'rgba(99,102,241,0.5)'  : 'rgba(99,102,241,0.45)';
+    if (count <= 6)  return isDark ? 'rgba(99,102,241,0.75)' : 'rgba(99,102,241,0.7)';
+    return '#6366F1';
+  }
+
+  // Build month label positions (by week index when month changes)
+  const monthPositions = [];
+  let lastMonth = -1;
+  for (let w = 0; w < 53; w++) {
+    const cell = cells[w * 7]; // first day of this week
+    if (cell) {
+      const m = cell.date.getMonth();
+      if (m !== lastMonth) {
+        monthPositions.push({ week: w, label: MONTH_LABELS[m] });
+        lastMonth = m;
+      }
+    }
+  }
+
+  // Group cells by week
+  const weeks = Array.from({ length: 53 }, (_, w) => cells.slice(w * 7, w * 7 + 7));
+
+  return (
+    <div className="rounded-2xl p-6" style={{ background: surface, border: `1px solid ${border}` }}>
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-sm font-headline font-bold" style={{ color: isDark ? '#e3e2e5' : '#0F172A' }}>
+          Daily Activity
+        </h2>
+        <span className="text-[10px]" style={{ color: textSec }}>Past year</span>
+      </div>
+
+      <div className="overflow-x-auto">
+        <div style={{ minWidth: '660px' }}>
+          {/* Month labels */}
+          <div className="flex mb-1" style={{ paddingLeft: '28px' }}>
+            {monthPositions.map(({ week, label }) => (
+              <div
+                key={`${week}-${label}`}
+                className="text-[9px] font-bold"
+                style={{ color: textSec, position: 'absolute', marginLeft: `${28 + week * 13}px` }}
+              >
+                {label}
+              </div>
+            ))}
+            <div style={{ height: '14px' }} />
+          </div>
+
+          <div className="flex gap-0.5" style={{ marginTop: '14px' }}>
+            {/* Day labels */}
+            <div className="flex flex-col gap-0.5 mr-1">
+              {DAY_LABELS.map((d, i) => (
+                <div key={i} className="text-[9px] leading-none flex items-center" style={{ height: '11px', color: textSec, width: '20px' }}>
+                  {d}
+                </div>
+              ))}
+            </div>
+
+            {/* Grid */}
+            {weeks.map((week, w) => (
+              <div key={w} className="flex flex-col gap-0.5">
+                {week.map((cell, d) => (
+                  <div
+                    key={d}
+                    title={`${cell.date.toDateString()}: ${cell.count} problems`}
+                    style={{
+                      width: '11px',
+                      height: '11px',
+                      borderRadius: '2px',
+                      background: cellColor(cell.count),
+                      flexShrink: 0,
+                    }}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+
+          {/* Legend */}
+          <div className="flex items-center gap-1.5 mt-3 justify-end">
+            <span className="text-[9px]" style={{ color: textSec }}>Less</span>
+            {[0, 2, 4, 6, 8].map(v => (
+              <div
+                key={v}
+                style={{ width: '10px', height: '10px', borderRadius: '2px', background: cellColor(v) }}
+              />
+            ))}
+            <span className="text-[9px]" style={{ color: textSec }}>More</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ══════════════════════════════════════════════════════════════ */
 
 function AnalyticsPage({ theme, toggleTheme }) {
@@ -130,6 +248,7 @@ function AnalyticsPage({ theme, toggleTheme }) {
   const pd = PLATFORM_DATA[solvedTab];
 
   const earnedCount = ACHIEVEMENTS.filter(a => a.earned).length;
+  const top3 = TOPIC_DATA.filter(t => t.isStrength);
 
   return (
     <DashboardLayout theme={theme} toggleTheme={toggleTheme}>
@@ -144,11 +263,10 @@ function AnalyticsPage({ theme, toggleTheme }) {
         {/* ── Row 1: Problems Solved + Achievements ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-          {/* Problems Solved — LeetCode-style */}
+          {/* Problems Solved */}
           <div className="rounded-2xl p-6" style={{ background: surface, border: `1px solid ${border}` }}>
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-sm font-headline font-bold" style={{ color: textPri }}>Problems Solved</h2>
-              {/* Platform toggle */}
               <div className="flex gap-0.5 p-1 rounded-xl" style={{ background: surfLow, border: `1px solid ${border}` }}>
                 {[
                   { key: 'total',      label: 'Total'    },
@@ -172,7 +290,6 @@ function AnalyticsPage({ theme, toggleTheme }) {
 
             <div className="flex items-center gap-6">
               <SolvedDonut pd={pd} surfLow={surfLow} textPri={textPri} textSec={textSec} />
-
               <div className="flex-grow space-y-3">
                 {[
                   { label: 'Easy',   data: pd.easy,   color: '#22C55E' },
@@ -194,8 +311,6 @@ function AnalyticsPage({ theme, toggleTheme }) {
                     </div>
                   </div>
                 ))}
-
-                {/* Redirect link — only for specific platforms */}
                 {pd.url && (
                   <a
                     href={pd.url}
@@ -211,7 +326,6 @@ function AnalyticsPage({ theme, toggleTheme }) {
               </div>
             </div>
 
-            {/* Streak footer */}
             <div className="mt-5 pt-4 flex items-center gap-4 flex-wrap" style={{ borderTop: `1px solid ${border}` }}>
               <div className="flex items-center gap-1.5">
                 <span>🔥</span>
@@ -235,7 +349,6 @@ function AnalyticsPage({ theme, toggleTheme }) {
                 {earnedCount}/{ACHIEVEMENTS.length} earned
               </span>
             </div>
-
             <div className="grid grid-cols-3 gap-3">
               {ACHIEVEMENTS.map((ach) => (
                 <div
@@ -262,87 +375,104 @@ function AnalyticsPage({ theme, toggleTheme }) {
           </div>
         </div>
 
-        {/* ── Row 2: Topic Progress + Top 3 Strengths ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* ── Row 2: Activity Heatmap ── */}
+        <ActivityHeatmap isDark={isDark} surface={surface} border={border} textSec={textSec} />
 
-          {/* Topic-wise progress */}
-          <div className="rounded-2xl p-6" style={{ background: surface, border: `1px solid ${border}` }}>
-            <h2 className="text-sm font-headline font-bold mb-5" style={{ color: textPri }}>Topic-wise Progress</h2>
-            <div className="space-y-3.5">
-              {TOPIC_DATA.map(({ name, solved, total, color }) => {
-                const pct = Math.round((solved / total) * 100);
-                return (
-                  <div key={name}>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span style={{ color: textPri, fontWeight: 600 }}>{name}</span>
-                      <span style={{ color: textSec }}>
-                        {solved}/{total} <span style={{ opacity: 0.6 }}>({pct}%)</span>
-                      </span>
+        {/* ── Row 3: Topic Progress + Top 3 Strengths (merged) ── */}
+        <div className="rounded-2xl p-6" style={{ background: surface, border: `1px solid ${border}` }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            {/* Left: All topic bars */}
+            <div>
+              <h2 className="text-sm font-headline font-bold mb-5" style={{ color: textPri }}>Topic-wise Progress</h2>
+              <div className="space-y-3.5">
+                {TOPIC_DATA.map(({ name, solved, total, color }) => {
+                  const pct = Math.round((solved / total) * 100);
+                  return (
+                    <div key={name}>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span style={{ color: textPri, fontWeight: 600 }}>{name}</span>
+                        <span style={{ color: textSec }}>
+                          {solved}/{total}
+                          <span style={{ opacity: 0.55 }}> ({pct}%)</span>
+                        </span>
+                      </div>
+                      <div className="h-2 w-full rounded-full overflow-hidden" style={{ background: surfLow }}>
+                        <div
+                          className="h-full rounded-full transition-all duration-700"
+                          style={{ width: `${pct}%`, background: color }}
+                        />
+                      </div>
                     </div>
-                    <div className="h-2 w-full rounded-full overflow-hidden" style={{ background: surfLow }}>
-                      <div
-                        className="h-full rounded-full transition-all duration-700"
-                        style={{ width: `${pct}%`, background: color }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Top 3 Strengths — before/after overlapping bars */}
-          <div className="rounded-2xl p-6" style={{ background: surface, border: `1px solid ${border}` }}>
-            <h2 className="text-sm font-headline font-bold" style={{ color: textPri }}>Top 3 Strengths</h2>
-            <p className="text-[10px] mt-1 mb-4" style={{ color: textSec }}>
-              Your strongest DSA areas — before vs. after using AlgoMind
-            </p>
-
-            <div className="flex gap-5 mb-5">
-              <div className="flex items-center gap-1.5">
-                <div className="w-4 h-2.5 rounded-sm" style={{ background: 'rgba(99,102,241,0.28)' }} />
-                <span className="text-[10px]" style={{ color: textSec }}>Before</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-4 h-2.5 rounded-sm" style={{ background: '#6366F1' }} />
-                <span className="text-[10px]" style={{ color: textSec }}>After</span>
+                  );
+                })}
               </div>
             </div>
 
-            <div className="space-y-7">
-              {TOP_STRENGTHS.map(({ name, before, after, color }) => (
-                <div key={name}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-bold" style={{ color: textPri }}>{name}</span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[10px]" style={{ color: textSec }}>{before}%</span>
-                      <span className="material-symbols-outlined" style={{ fontSize: '12px', color: '#22C55E' }}>arrow_forward</span>
-                      <span className="text-[10px] font-bold" style={{ color: '#22C55E' }}>+{after - before}%</span>
-                    </div>
-                  </div>
-                  {/* Overlapping bars */}
-                  <div className="relative h-7 rounded-xl overflow-hidden" style={{ background: surfLow }}>
-                    {/* Before — darker, semi-transparent, full height */}
-                    <div
-                      className="absolute top-0 left-0 h-full rounded-xl transition-all duration-700"
-                      style={{ width: `${before}%`, background: `${color}35` }}
-                    />
-                    {/* After — brighter, inset vertically (overlapping "on top") */}
-                    <div
-                      className="absolute top-1.5 left-0 rounded-xl transition-all duration-700"
-                      style={{ width: `${after}%`, height: 'calc(100% - 12px)', background: color, opacity: 0.85 }}
-                    />
-                    <div className="absolute inset-0 flex items-center px-3">
-                      <span
-                        className="text-[9px] font-extrabold text-white"
-                        style={{ textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}
-                      >
-                        {after}%
-                      </span>
-                    </div>
-                  </div>
+            {/* Divider */}
+            <div className="hidden lg:block absolute" style={{ left: '50%', top: 0, bottom: 0, width: '1px' }} />
+
+            {/* Right: Top 3 Strengths */}
+            <div>
+              <h2 className="text-sm font-headline font-bold" style={{ color: textPri }}>Top 3 Strengths</h2>
+              <p className="text-[10px] mt-0.5 mb-5" style={{ color: textSec }}>
+                Before vs. after AlgoMind
+              </p>
+
+              {/* Legend */}
+              <div className="flex gap-5 mb-5">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-4 h-2 rounded-sm" style={{ background: 'rgba(99,102,241,0.25)' }} />
+                  <span className="text-[10px]" style={{ color: textSec }}>Before</span>
                 </div>
-              ))}
+                <div className="flex items-center gap-1.5">
+                  <div className="w-4 h-2 rounded-sm" style={{ background: '#6366F1' }} />
+                  <span className="text-[10px]" style={{ color: textSec }}>After</span>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {top3.map(({ name, before, after }) => (
+                  <div key={name}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-bold" style={{ color: textPri }}>{name}</span>
+                      <span className="text-[10px] font-bold" style={{ color: '#22C55E' }}>
+                        +{after - before}%
+                      </span>
+                    </div>
+
+                    {/* Before row */}
+                    <div className="mb-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] w-9 text-right shrink-0" style={{ color: textSec }}>
+                          {before}%
+                        </span>
+                        <div className="flex-grow h-2 rounded-full overflow-hidden" style={{ background: surfLow }}>
+                          <div
+                            className="h-full rounded-full transition-all duration-700"
+                            style={{ width: `${before}%`, background: 'rgba(99,102,241,0.28)' }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* After row */}
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] w-9 text-right shrink-0 font-bold" style={{ color: '#6366F1' }}>
+                          {after}%
+                        </span>
+                        <div className="flex-grow h-2 rounded-full overflow-hidden" style={{ background: surfLow }}>
+                          <div
+                            className="h-full rounded-full transition-all duration-700"
+                            style={{ width: `${after}%`, background: '#6366F1' }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -370,74 +500,6 @@ function AnalyticsPage({ theme, toggleTheme }) {
                 >
                   {status}
                 </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Friend Leaderboard ── */}
-        <div className="rounded-2xl p-6" style={{ background: surface, border: `1px solid ${border}` }}>
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-sm font-headline font-bold" style={{ color: textPri }}>Friend Leaderboard</h2>
-            <a
-              href="/friends"
-              className="text-[10px] font-bold transition-opacity hover:opacity-70"
-              style={{ color: '#6366F1' }}
-            >
-              View all →
-            </a>
-          </div>
-
-          <div className="grid grid-cols-4 gap-4 px-3 pb-3">
-            {['Rank', 'Name', 'Solved', 'Streak'].map(h => (
-              <span key={h} className="text-[10px] font-bold uppercase tracking-widest" style={{ color: textSec }}>{h}</span>
-            ))}
-          </div>
-
-          <div className="space-y-2">
-            {FRIEND_LB.map(f => (
-              <div
-                key={f.rank}
-                className="rounded-xl p-3 transition-all hover:scale-[1.002]"
-                style={{
-                  background: f.isSelf ? (isDark ? 'rgba(99,102,241,0.08)' : '#EEF2FF') : surfLow,
-                  border: `1px solid ${f.isSelf ? 'rgba(99,102,241,0.25)' : border}`,
-                }}
-              >
-                <div className="grid grid-cols-4 gap-4 items-center">
-                  <span className="text-base font-headline font-extrabold"
-                    style={{ color: f.rank <= 3 ? ['#F59E0B', '#94A3B8', '#CD7C2F'][f.rank - 1] : textSec }}>
-                    {f.rank <= 3 ? ['🥇', '🥈', '🥉'][f.rank - 1] : `#${f.rank}`}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-extrabold text-white shrink-0"
-                      style={{ background: f.color }}
-                    >
-                      {f.avatar}
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold" style={{ color: f.isSelf ? '#6366F1' : textPri }}>
-                        {f.name}
-                        {f.isSelf && (
-                          <span
-                            className="ml-1 text-[8px] px-1 py-0.5 rounded"
-                            style={{ background: 'rgba(99,102,241,0.15)', color: '#6366F1' }}
-                          >You</span>
-                        )}
-                      </p>
-                      <div className="flex items-center gap-1">
-                        <div className="w-1 h-1 rounded-full" style={{ background: f.online ? '#22C55E' : '#64748B' }} />
-                        <span className="text-[8px]" style={{ color: textSec }}>{f.online ? 'Online' : 'Offline'}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-xs font-bold" style={{ color: textPri }}>{f.solved}</span>
-                  <span className="text-xs font-bold flex items-center gap-1">
-                    <span>🔥</span>
-                    <span style={{ color: textPri }}>{f.streak}d</span>
-                  </span>
-                </div>
               </div>
             ))}
           </div>
