@@ -2,23 +2,22 @@ import { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 import LoginPage      from '../pages/Login/LoginPage.jsx';
-// Phase 1: Not included yet
-// import GoalPage       from '../pages/Goal/GoalPage.jsx';
-// import PlanPage       from '../pages/Plan/PlanPage.jsx';
-// import Dashboard      from '../pages/DashBoard/Dashboard.jsx';
-// import AnalyticsPage  from '../pages/Analytics/AnalyticsPage.jsx';
-// import PlanViewPage   from '../pages/PlanView/PlanViewPage.jsx';
-// import ArenaPage      from '../pages/Arena/ArenaPage.jsx';
-// import ResourcesPage  from '../pages/Resources/ResourcesPage.jsx';
-// import ChallengesPage from '../pages/Challenges/ChallengesPage.jsx';
-// import FriendsPage    from '../pages/Friends/FriendsPage.jsx';
-// import CommunityPage  from '../pages/Community/CommunityPage.jsx';
-// import ChatbotPage    from '../pages/Chatbot/ChatbotPage.jsx';
-// import SettingsPage   from '../pages/Settings/SettingsPage.jsx';
-// import ProfilePage    from '../pages/Profile/ProfilePage.jsx';
-// import SupportPage    from '../pages/Support/SupportPage.jsx';
-// import PrivacyPage    from '../pages/Privacy/PrivacyPage.jsx';
-// import PlansPage      from '../pages/Plans/PlansPage.jsx';
+import GoalPage       from '../pages/Goal/GoalPage.jsx';
+import PlanPage       from '../pages/Plan/PlanPage.jsx';
+import Dashboard      from '../pages/DashBoard/Dashboard.jsx';
+import AnalyticsPage  from '../pages/Analytics/AnalyticsPage.jsx';
+import PlanViewPage   from '../pages/PlanView/PlanViewPage.jsx';
+import ArenaPage      from '../pages/Arena/ArenaPage.jsx';
+import ResourcesPage  from '../pages/Resources/ResourcesPage.jsx';
+import ChallengesPage from '../pages/Challenges/ChallengesPage.jsx';
+import FriendsPage    from '../pages/Friends/FriendsPage.jsx';
+import CommunityPage  from '../pages/Community/CommunityPage.jsx';
+import ChatbotPage    from '../pages/Chatbot/ChatbotPage.jsx';
+import SettingsPage   from '../pages/Settings/SettingsPage.jsx';
+import ProfilePage    from '../pages/Profile/ProfilePage.jsx';
+import SupportPage    from '../pages/Support/SupportPage.jsx';
+import PrivacyPage    from '../pages/Privacy/PrivacyPage.jsx';
+import PlansPage      from '../pages/Plans/PlansPage.jsx';
 
 function App() {
   const [isDark, setIsDark] = useState(() => {
@@ -50,10 +49,10 @@ function App() {
     <Routes>
       {/* ── Onboarding flow ──────────────────────────────── */}
       <Route path="/"          element={<LoginPage     {...thin} />} />
-      {/*
       <Route path="/goal"      element={<GoalPage      {...thin} />} />
       <Route path="/plan"      element={<PlanPage      {...thin} />} />
 
+      {/* ── Dashboard ────────────────────────────────────── */}
       <Route path="/dashboard"  element={<Dashboard      {...dash} />} />
       <Route path="/analytics"  element={<AnalyticsPage  {...dash} />} />
       <Route path="/plan-view"  element={<PlanViewPage   {...dash} />} />
@@ -67,10 +66,10 @@ function App() {
       <Route path="/settings"   element={<SettingsPage   {...dash} />} />
       <Route path="/profile"    element={<ProfilePage    {...dash} />} />
 
+      {/* ── Standalone pages ─────────────────────────────── */}
       <Route path="/support"    element={<SupportPage    {...thin} />} />
       <Route path="/privacy"    element={<PrivacyPage    {...thin} />} />
       <Route path="/plans"      element={<PlansPage      {...thin} />} />
-      */}
     </Routes>
   );
 }
