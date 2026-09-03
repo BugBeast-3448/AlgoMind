@@ -4,6 +4,11 @@
 
 AlgoMind is a learning-focused platform designed to help students learn **Data Structures and Algorithms (DSA)** in a structured and systematic way.
 
+## 🌐 Live Demo
+
+🚀 [Visit AlgoMind](https://algomind-frontend-dvfp.onrender.com/)
+**Note:** The live deployment may include features and improvements
+
 Instead of jumping randomly between problems and topics, AlgoMind aims to provide students with a guided learning experience where they can understand concepts, practice problems, track their progress, and improve their problem-solving skills.
 
 ---
